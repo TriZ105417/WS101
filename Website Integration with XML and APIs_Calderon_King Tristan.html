@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weapon Store</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FCF596;
+        }
+        header {
+            background-color: #d22929;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        section {
+            background: white;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #9dc11b;
+        }
+        p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body onload="loadXMLData(); loadAPIData();">
+    <header>
+        <h1>Weapon Store</h1>
+        <p>Choose your gun desire</p>
+    </header>
+    <main>
+        <section id="xml-data">
+            <h2>Product List (XML)</h2>
+            <p>Loading...</p>
+        </section>
+        <section id="api-data">
+            <h2>Weather Information (API)</h2>
+            <p>Loading weather updates...</p>
+        </section>
+    </main>
+    <script>
+        // Load XML Data
+        function loadXMLData() {
+            fetch('data.xml')
+                .then(response => response.text())
+                .then(xmlString => {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlString, 'application/xml');
+                    const products = xmlDoc.getElementsByTagName('Product');
+
+                    let output = '';
+                    for (let product of products) {
+                        const name = product.getElementsByTagName('SCAR FN')[0].textContent;
+                        const price = product.getElementsByTagName('45,000PHP')[0].textContent;
+                        const category = product.getElementsByTagName('RIFLE')[0].textContent;
+
+                        output += <p><strong>${name}</strong> - $${price} (${category})</p>;
+                    }
+                    document.getElementById('xml-data').innerHTML = output;
+                })
+                .catch(error => {
+                    document.getElementById('xml-data').innerHTML = '<p>Error loading XML data.</p>';
+                    console.error('Error loading XML:', error);
+                });
+        }
+
+        // Load API Data (OpenWeather API)
+        function loadAPIData() {
+            const apiKey = '56251954b8f79b1b5b23b621aab18828'; // Use the API key only
+const city = 'Manila';
+const url = https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric;
+
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const weatherInfo = `
+                        <p><strong>City:</strong> ${city}</p>
+                        <p><strong>Temperature:</strong> ${data.main.temp}°C</p>
+                        <p><strong>Condition:</strong> ${data.weather[0].description}</p>
+                    `;
+                    document.getElementById('api-data').innerHTML = weatherInfo;
+                })
+                .catch(error => {
+                    document.getElementById('api-data').innerHTML = '<p>Error loading weather data.</p>';
+                    console.error('Error fetching API data:', error);
+                });
+        }
+    </script>
+</body>
+</html>
